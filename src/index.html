@@ -499,6 +499,11 @@
     .ingredient-card.selected {
       box-shadow: 0 0 0 5px var(--yellow), 4px 4px 0 var(--black);
     }
+    .ingredient-card.missed { animation: missedFade 0.5s ease-out forwards; }
+    @keyframes missedFade {
+      0%   { opacity: 1; transform: translateY(0); }
+      100% { opacity: 0; transform: translateY(24px); }
+    }
     /* ─── Bonus cards ────────────────────────────────────────── */
     @keyframes bonusGlow {
       from { box-shadow: 0 0 8px 3px #ffd700, 4px 4px 0 var(--black); }
@@ -1308,12 +1313,15 @@ function physicsLoop() {
     card.y += card.velY;
     card.el.style.top = card.y + 'px';
     if (card.y >= floorY && !card.atFloor) {
-      card.y = floorY;
       card.atFloor = true;
-      card.el.classList.add('shake');
-      setTimeout(() => card.el.classList.remove('shake'), 350);
+      card.answered = true;
+      card.el.classList.add('missed');
+      setTimeout(() => {
+        card.el.remove();
+        state.activeCards = state.activeCards.filter(c => c.id !== card.id);
+        updateCardSelection();
+      }, 500);
     }
-    if (card.atFloor) card.y = floorY;
   });
 }
 
